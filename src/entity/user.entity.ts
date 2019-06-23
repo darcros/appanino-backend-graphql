@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { ObjectType, Field, ID } from 'type-graphql';
+import { School } from './school.entity';
 
 @Entity('users')
 @ObjectType()
@@ -22,4 +23,11 @@ export class User {
 
   @Column('varchar')
   public password: string;
+
+  @Column('int')
+  @Field(() => ID)
+  public schoolId: number;
+
+  @ManyToOne(() => School, school => school.users)
+  public school: School;
 }
