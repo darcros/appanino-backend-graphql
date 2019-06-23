@@ -4,6 +4,8 @@ import { User } from '../../entity/user.entity';
 import { UserRepository } from './user.repository';
 import { SchoolRepository } from '../school/school.repository';
 import { School } from '../../entity/school.entity';
+import { Order } from '../../entity/order.entity';
+import { OrderRepository } from '../order/order.repository';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -11,6 +13,8 @@ export class UserResolver {
   private readonly userRepository: UserRepository;
   @InjectRepository(SchoolRepository)
   private readonly schoolRepository: SchoolRepository;
+  @InjectRepository(OrderRepository)
+  private readonly orderRepository: OrderRepository;
 
   @Query(() => [User])
   public async users() {
@@ -20,5 +24,10 @@ export class UserResolver {
   @FieldResolver(() => School)
   public async school(@Root() user: User) {
     return await this.schoolRepository.findOne({ where: { id: user.schoolId } });
+  }
+
+  @FieldResolver(() => [Order])
+  public async orders(@Root() user: User) {
+    return await this.orderRepository.find({ where: { userId: user.id } });
   }
 }

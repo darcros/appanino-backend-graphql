@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { School } from './school.entity';
+import { Order } from './order.entity';
 
 @Entity('users')
 @ObjectType()
@@ -30,4 +31,7 @@ export class User {
 
   @ManyToOne(() => School, school => school.users)
   public school: School;
+
+  @OneToMany(() => Order, order => order.user)
+  public orders: Order;
 }
