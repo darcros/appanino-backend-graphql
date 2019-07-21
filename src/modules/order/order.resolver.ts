@@ -1,9 +1,9 @@
-import { Resolver, Query, FieldResolver, Root } from 'type-graphql';
+import { Resolver, Query, FieldResolver, Root, Authorized } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Order } from '../../entity/order.entity';
 import { OrderRepository } from './order.repository';
 import { UserRepository } from '../user/user.repository';
-import { User } from '../../entity/user.entity';
+import { User, Role } from '../../entity/user.entity';
 
 @Resolver(() => Order)
 export class ProductResolver {
@@ -12,6 +12,7 @@ export class ProductResolver {
   @InjectRepository(UserRepository)
   private readonly userRepository: UserRepository;
 
+  @Authorized(Role.Admin, Role.SchoolAdmin)
   @Query(() => [Order])
   public async orders() {
     return await this.orderRepository.find();
