@@ -1,5 +1,6 @@
 import { Resolver, Arg, Mutation } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { UserRepository } from '../../user/user.repository';
 import { LOGIN_FAILED } from './login.error';
@@ -13,11 +14,16 @@ export class LoginResolver {
   @Mutation(() => String, { description: 'Returns a jwt to use for authentication' })
   public async login(@Arg('email') LoginEmail: string, @Arg('password') password: string) {
     const foundUser = await this.userRepository.findOne({
-      where: { LoginEmail, password },
+      where: { email: LoginEmail },
       relations: ['school'],
     });
 
     if (!foundUser) {
+      throw LOGIN_FAILED;
+    }
+
+    const passwordMatch = await bcrypt.compare(password, foundUser.password);
+    if (!passwordMatch) {
       throw LOGIN_FAILED;
     }
 

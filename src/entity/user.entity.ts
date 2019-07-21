@@ -38,7 +38,6 @@ export class User {
   @Column('varchar')
   public email: string;
 
-  // TODO: encode passwords with bcrypt
   @Column('varchar')
   public password: string;
 
