@@ -27,7 +27,7 @@ export class RegistrationResolver {
   private readonly userRepository: UserRepository;
 
   @Mutation(() => Boolean, { description: 'creates a new user' })
-  public async register(@Arg('UserRegistrationData') userRegistrationData: UserRegistrationDataInput) {
+  public async register(@Arg('userRegistrationData') userRegistrationData: UserRegistrationDataInput) {
     console.log(userRegistrationData);
 
     const hashedPassword = await bcrypt.hash(userRegistrationData.password, 10);
