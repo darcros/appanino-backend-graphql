@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import * as express from 'express';
-import * as jwt from 'express-jwt';
+import * as jwt from 'jsonwebtoken';
 import { initConnection } from './database/init.database';
 import { ApolloServer } from 'apollo-server-express';
 import { bootstrapSchema } from './util/schema.util';
@@ -8,6 +8,7 @@ import { Container } from 'typedi';
 import { useContainer } from 'typeorm';
 import { useContainer as typeUseContainer } from 'type-graphql';
 import { Context } from './util/context.interface';
+import { JwtUserInfo } from './modules/authentication/jwtUserInfo.interface';
 
 typeUseContainer(Container);
 useContainer(Container);
@@ -20,22 +21,29 @@ export default async () => {
   const app = express();
   const path = '/graphql';
 
-  app.use(
-    path,
-    jwt({
-      // TODO: read secret from environment variable
-      secret: 'SECRET',
-      credentialsRequired: false,
-    }),
-  );
-
   const schema = await bootstrapSchema();
   const apollo = new ApolloServer({
     schema,
     playground: true,
-    context: ({ req }): Context => ({
-      user: req.user, // from `express-jwt`
-    }),
+    context: async ({ req }): Promise<Context> => {
+      try {
+        const authHeader: string = req.headers.authorization || '';
+        if (!authHeader) {
+          return {};
+        }
+
+        const token = authHeader.replace(/^Bearer /, '');
+
+        const decoded = await jwt.verify(token, 'SECRET');
+        const data: JwtUserInfo = typeof decoded === 'string' ? JSON.parse(decoded) : decoded;
+
+        return {
+          user: data,
+        };
+      } catch (e) {
+        return {};
+      }
+    },
   });
   apollo.applyMiddleware({ app, path });
 
