@@ -5,13 +5,13 @@ import { Order } from './order.entity';
 
 export enum Role {
   // Normal user
-  User = 'USER',
+  User = 'User',
 
   // School admin aka Paninaro
-  SchoolAdmin = 'SCHOOL_ADMIN',
+  SchoolAdmin = 'SchoolAdmin',
 
   // System Admin
-  Admin = 'ADMIN',
+  Admin = 'Admin',
 }
 
 // I have to register the type this way because decorators only work on classes
