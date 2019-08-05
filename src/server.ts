@@ -34,7 +34,7 @@ export default async () => {
 
         const token = authHeader.replace(/^Bearer /, '');
 
-        const decoded = await jwt.verify(token, 'SECRET');
+        const decoded = await jwt.verify(token, process.env.JWT_SECRET || 'SECRET');
         const data: JwtUserInfo = typeof decoded === 'string' ? JSON.parse(decoded) : decoded;
 
         return {

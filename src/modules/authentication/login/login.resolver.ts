@@ -37,8 +37,7 @@ export class LoginResolver {
       },
     };
 
-    // TODO: read secret from environment variable
-    const token = jwt.sign(userData, 'SECRET', {
+    const token = jwt.sign(userData, process.env.JWT_SECRET || 'SECRET', {
       // audience: '',
       // issuer: '',
       expiresIn: '2 days',
