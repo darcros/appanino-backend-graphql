@@ -1,29 +1,45 @@
 import { Client } from 'pg';
-import { database } from '../../ormconfig.json';
-import { createConnection } from 'typeorm';
+import { createConnection, getConnectionOptions } from 'typeorm';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
-// Check if the database is already existing by using the native Postgres Driver
-// It takes the database name from the ormconfig.json file, if it not exist then it is created
-// After the database creation/check, typeorm is connected to Postgres and the native connection it's closed
+// Creates the database if it doesn't already exist
+const createDbIfNotExists = async () => {
+  const ormOptions = (await getConnectionOptions()) as PostgresConnectionOptions;
+
+  const client = new Client({
+    host: ormOptions.host,
+    port: ormOptions.port,
+    password: ormOptions.password,
+    user: ormOptions.username,
+    database: 'postgres',
+  });
+  await client.connect(); // Connect to Postgres with native client
+
+  const { rowCount: dbExists } = await client.query(
+    `SELECT datname FROM pg_catalog.pg_database WHERE datname = '${ormOptions.database}'`,
+  ); // Makes the query to check if the database already exist
+
+  // If the database doesn't exist, then it's created
+  if (!dbExists) {
+    await client.query(`CREATE DATABASE "${ormOptions.database}"`);
+  }
+  await client.end(); // Native driver is closed
+};
+
+// Creates the database if it doesn't exist then connects TypeORM
 export const initConnection = async () => {
+  console.log('Initializing database connection...');
   try {
-    const client = new Client({ password: 'root', user: 'postgres', database: 'postgres' });
-    await client.connect(); // Trying to connect to Postgres
-
-    const { rowCount: isExisting } = await client.query(
-      `SELECT datname FROM pg_catalog.pg_database WHERE datname = '${database}'`,
-    ); // Makes the query to check is the database already exist
-
-    // If the database not exist, then it's created
-    if (!isExisting) {
-      await client.query(`CREATE DATABASE "${database}"`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Ensuring database existence...');
+      await createDbIfNotExists();
     }
 
-    await createConnection(); // Typeorm connection it's made
-    await client.end(); // Native driver it's closed
+    await createConnection();
+    console.log('Database connected!');
   } catch (error) {
-    // If an error occurs the application it's stopped
-    console.log('Connection to the database failed, exiting application');
+    console.error(error);
+    console.error('Connection to the database failed, exiting application');
     process.exit();
   }
 };

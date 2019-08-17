@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+
+  # The Appanino graphQL API server
+  appanino-graphql:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      # secret for signing jwt auth tokens
+      JWT_SECRET: 'SECRET'
+      # database configuration
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: root
+    ports:
+      - 4000:4000
+
+  # Postgres DB, credentials are postgres/root (user/password)
+  # TODO: use volume for data persistence
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: appanino-db
+    ports:
+      - 5432:5432
+
+  # DB administration panel
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
