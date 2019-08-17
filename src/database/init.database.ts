@@ -28,9 +28,15 @@ const createDbIfNotExists = async () => {
 
 // Creates the database if it doesn't exist then connects TypeORM
 export const initConnection = async () => {
+  console.log('Initializing database connection...');
   try {
-    await createDbIfNotExists(); // TODO: add option to disable automatic DB creation
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Ensuring database existence...');
+      await createDbIfNotExists();
+    }
+
     await createConnection();
+    console.log('Database connected!');
   } catch (error) {
     console.error(error);
     console.error('Connection to the database failed, exiting application');

@@ -26,6 +26,7 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: root
+      POSTGRES_DB: appanino-db
     ports:
       - 5432:5432
 
