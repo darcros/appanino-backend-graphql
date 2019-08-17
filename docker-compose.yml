@@ -11,7 +11,7 @@ services:
     environment:
       # secret for signing jwt auth tokens
       JWT_SECRET: 'SECRET'
-      # database configuration (overrides ormconfig.json)
+      # database configuration
       DB_HOST: db
       DB_PORT: 5432
       DB_USERNAME: postgres
