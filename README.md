@@ -9,6 +9,10 @@ See [below](#Environment-variables) for details.
 
 ## Environment variables
 
+### NODE_ENV
+
+When `NODE_ENV` is set to `production` it disables the automatic database creation.
+
 ### JWT_SECRET
 
 The secret used to sign JWTs.
