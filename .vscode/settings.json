@@ -4,8 +4,12 @@
     {"language":"typescript", "autoFix": true}
   ],
   "cSpell.words": [
+    "Appanino",
     "firstname",
+    "graphql",
     "lastname",
+    "ormconfig",
+    "postgres",
     "typedi",
     "typeorm",
     "varchar"
