@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne } from 'typeorm';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { School } from './school.entity';
+import { Category } from './category.entity';
 
 @Entity('products')
 @ObjectType()
@@ -20,4 +21,10 @@ export class Product {
   @ManyToMany(() => School, school => school.products)
   @JoinTable({ name: 'schools_products' })
   public schools: School[];
+
+  @Column('int', { nullable: false })
+  public categoryId: number;
+
+  @ManyToOne(() => Category, category => category.products)
+  public category: Category;
 }

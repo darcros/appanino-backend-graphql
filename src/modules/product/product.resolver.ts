@@ -18,6 +18,8 @@ import { School } from '../../entity/school.entity';
 import { Role } from '../../entity/user.entity';
 import { LoggedInContext } from '../../util/context.interface';
 import { SchoolRepository } from '../school/school.repository';
+import { Category } from '../../entity/category.entity';
+import { CategoryRepository } from '../category/category.repository';
 
 @InputType()
 class NewProductDataInput {
@@ -29,6 +31,9 @@ class NewProductDataInput {
 
   @Field(() => [ID])
   public schoolIds: number[];
+
+  @Field(() => ID)
+  public categoryId: number;
 }
 
 @Resolver(() => Product)
@@ -37,6 +42,8 @@ export class ProductResolver {
   private readonly productRepository: ProductRepository;
   @InjectRepository(SchoolRepository)
   private readonly schoolRepository: SchoolRepository;
+  @InjectRepository(CategoryRepository)
+  private readonly categoryRepository: CategoryRepository;
 
   @Query(() => [Product], { description: 'Returns a list of products' })
   @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
@@ -71,13 +78,15 @@ export class ProductResolver {
   @Mutation(() => Product, { description: 'Creates a new product' })
   @Authorized(Role.Admin, Role.SchoolAdmin)
   public async addProduct(@Arg('newProductData') newProductData: NewProductDataInput) {
-    const schools = await Promise.all(newProductData.schoolIds.map(id => this.schoolRepository.findOneOrFail(id)));
+    const { name, price, schoolIds, categoryId } = newProductData;
 
-    const { name, price } = newProductData;
-    return await this.productRepository.save({
+    return this.productRepository.save({
       name,
       price,
-      schools,
+      schools: schoolIds.map(id => ({ id })),
+      category: {
+        id: categoryId,
+      },
     });
   }
 
@@ -96,5 +105,10 @@ export class ProductResolver {
     const foundProduct = await this.productRepository.findOne(product.id, { relations: ['schools'] });
 
     return foundProduct ? foundProduct.schools : [];
+  }
+
+  @FieldResolver(() => Category)
+  public async category(@Root() product: Product) {
+    return this.categoryRepository.findOne({ where: { id: product.categoryId } });
   }
 }
