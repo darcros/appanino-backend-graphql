@@ -2,6 +2,7 @@ import { Resolver, Mutation, InputType, Field, ID, Arg } from 'type-graphql';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { UserRepository } from '../../user/user.repository';
+import { User } from '../../../entity/user.entity';
 
 @InputType()
 class UserRegistrationDataInput {
@@ -26,17 +27,16 @@ export class RegistrationResolver {
   @InjectRepository(UserRepository)
   private readonly userRepository: UserRepository;
 
-  @Mutation(() => Boolean, { description: 'creates a new user' })
+  @Mutation(() => User, { description: 'creates a new user' })
   public async register(@Arg('userRegistrationData') userRegistrationData: UserRegistrationDataInput) {
     console.log(userRegistrationData);
 
     const hashedPassword = await bcrypt.hash(userRegistrationData.password, 10);
-    const savedUser = await this.userRepository.save({
+    const newUser = await this.userRepository.save({
       ...userRegistrationData,
       password: hashedPassword,
     });
-    console.log(savedUser);
 
-    return true;
+    return newUser;
   }
 }
