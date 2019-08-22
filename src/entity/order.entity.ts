@@ -16,7 +16,6 @@ export class Order {
   public totalPrice: number; // Total price of the order
 
   @Column('int')
-  @Field(() => ID)
   public userId: number; // Id of the user that made the order
 
   @ManyToOne(() => User, user => user.orders)

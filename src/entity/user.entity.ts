@@ -46,7 +46,6 @@ export class User {
   public role: Role;
 
   @Column('int')
-  @Field(() => ID)
   public schoolId: number;
 
   @ManyToOne(() => School, school => school.users)
