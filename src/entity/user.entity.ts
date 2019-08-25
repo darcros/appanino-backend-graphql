@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
+import * as bcrypt from 'bcrypt';
+
 import { School } from './school.entity';
 import { Order } from './order.entity';
 
@@ -53,4 +55,11 @@ export class User {
 
   @OneToMany(() => Order, order => order.user)
   public orders: Order;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  public async hashPassword() {
+    console.log('-----------------------------------------------------------------------');
+    this.password = await bcrypt.hash(this.password, 10);
+  }
 }
