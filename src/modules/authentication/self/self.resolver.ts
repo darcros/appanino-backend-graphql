@@ -7,6 +7,7 @@ import { UserRepository } from '../../user/user.repository';
 import { PasswordUpdateInput } from './passwordUpdate.input';
 import { UserUpdateInput } from './userUpdate.input';
 import { WRONG_PASSWORD } from './wrongPassword.error';
+import { SAME_PASSWORD } from './samePassword.error';
 
 @Resolver()
 export class SelfResolver {
@@ -29,12 +30,16 @@ export class SelfResolver {
   @Authorized()
   @Mutation(() => User, { description: 'Update the password of the current user' })
   public async updatePassword(@Ctx() ctx: LoggedInContext, @Arg('updateData') input: PasswordUpdateInput) {
-    const { oldPassword, newPassword } = input;
     const user = await this.userRepository.findOneOrFail(ctx.user.id);
+    const { oldPassword, newPassword } = input;
 
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
       throw WRONG_PASSWORD;
+    }
+
+    if (oldPassword === newPassword) {
+      throw SAME_PASSWORD;
     }
 
     user.password = newPassword;
