@@ -8,6 +8,7 @@ import { PasswordUpdateInput } from './passwordUpdate.input';
 import { UserUpdateInput } from './userUpdate.input';
 import { WRONG_PASSWORD } from './wrongPassword.error';
 import { SAME_PASSWORD } from './samePassword.error';
+import { EmailUpdateInput } from './emailUpdate.input';
 
 @Resolver()
 export class SelfResolver {
@@ -25,6 +26,14 @@ export class SelfResolver {
   public async updateSelf(@Ctx() ctx: LoggedInContext, @Arg('updateData') input: UserUpdateInput) {
     await this.userRepository.update(ctx.user.id, input);
     return this.userRepository.findOne(ctx.user.id);
+  }
+
+  @Authorized()
+  @Mutation(() => User, { description: 'Update the email of the current user' })
+  public async updateEmail(@Ctx() ctx: LoggedInContext, @Arg('updateData') input: EmailUpdateInput) {
+    const user = await this.userRepository.findOneOrFail(ctx.user.id);
+    user.email = input.newEmail;
+    return this.userRepository.save(user);
   }
 
   @Authorized()
