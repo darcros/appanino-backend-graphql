@@ -9,6 +9,7 @@ import { UserUpdateInput } from './userUpdate.input';
 import { WRONG_PASSWORD } from './wrongPassword.error';
 import { SAME_PASSWORD } from './samePassword.error';
 import { EmailUpdateInput } from './emailUpdate.input';
+import { NONEXISTENT_EMAIL } from './nonexistentEmail.error';
 
 @Resolver()
 export class SelfResolver {
@@ -31,8 +32,17 @@ export class SelfResolver {
   @Authorized()
   @Mutation(() => User, { description: 'Update the email of the current user' })
   public async updateEmail(@Ctx() ctx: LoggedInContext, @Arg('updateData') input: EmailUpdateInput) {
+    // FIXME: this is only temporary
+    // TODO: actually send email to the address to verify it's existence
+    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    const { newEmail } = input;
+    if (!emailRegex.test(newEmail)) {
+      throw NONEXISTENT_EMAIL;
+    }
+
     const user = await this.userRepository.findOneOrFail(ctx.user.id);
-    user.email = input.newEmail;
+    user.email = newEmail;
     return this.userRepository.save(user);
   }
 
