@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
 import * as bcrypt from 'bcrypt';
-
+import { Lazy } from '../database/typeorm.helper';
 import { School } from './school.entity';
 import { Order } from './order.entity';
 
@@ -47,14 +47,13 @@ export class User {
   @Field(() => Role)
   public role: Role;
 
-  @Column('int')
-  public schoolId: number;
+  @Field(() => School)
+  @ManyToOne(() => School, school => school.users, { lazy: true })
+  public school: Lazy<School>;
 
-  @ManyToOne(() => School, school => school.users)
-  public school: School;
-
-  @OneToMany(() => Order, order => order.user)
-  public orders: Order;
+  @Field(() => [Order])
+  @OneToMany(() => Order, order => order.user, { lazy: true })
+  public orders: Lazy<Order[]>;
 
   @BeforeInsert()
   @BeforeUpdate()
