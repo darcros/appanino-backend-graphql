@@ -3,6 +3,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { User } from './user.entity';
+import { Lazy } from '../database/typeorm.helper';
 
 @Entity('orders')
 @ObjectType()
@@ -18,6 +19,7 @@ export class Order {
   @Column('int')
   public userId: number; // Id of the user that made the order
 
-  @ManyToOne(() => User, user => user.orders)
-  public user: User; // Field for Type-Graphql that gives the user info
+  @Field(() => User)
+  @ManyToOne(() => User, user => user.orders, { lazy: true })
+  public user: Lazy<User>; // Field for Type-Graphql that gives the user info
 }
