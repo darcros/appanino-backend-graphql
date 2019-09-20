@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { Product } from './product.entity';
+import { Lazy } from '../database/typeorm.helper';
 
 @Entity('categories')
 @ObjectType()
@@ -13,6 +14,7 @@ export class Category {
   @Column('varchar')
   public name: string;
 
-  @OneToMany(() => Product, product => product.category)
-  public products: Product[];
+  @Field(() => [Product])
+  @OneToMany(() => Product, product => product.category, { lazy: true })
+  public products: Lazy<Product[]>;
 }
