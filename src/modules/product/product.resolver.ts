@@ -37,7 +37,7 @@ export class ProductResolver {
 
   @Query(() => Product, { nullable: true, description: 'Returns a product given its ID' })
   @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
-  public async product(@Arg('id') id: number) {
+  public async product(@Arg('id', () => ID) id: number) {
     return await this.productRepository.findOne(id);
   }
 
@@ -58,7 +58,7 @@ export class ProductResolver {
 
   @Mutation(() => Boolean, { description: 'Deletes a products given its ID' })
   @Authorized(Role.Admin, Role.SchoolAdmin)
-  public async deleteProduct(@Arg('id') id: number) {
+  public async deleteProduct(@Arg('id', () => ID) id: number) {
     const product = await this.productRepository.findOne(id);
     if (!product) return false;
 
