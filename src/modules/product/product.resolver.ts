@@ -1,25 +1,10 @@
-import {
-  Resolver,
-  Query,
-  FieldResolver,
-  Root,
-  Authorized,
-  InputType,
-  Field,
-  Mutation,
-  Arg,
-  Ctx,
-  ID,
-} from 'type-graphql';
+import { Resolver, Query, Authorized, InputType, Field, Mutation, Arg, Ctx, ID } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Product } from '../../entity/product.entity';
 import { ProductRepository } from './product.repository';
-import { School } from '../../entity/school.entity';
 import { Role } from '../../entity/user.entity';
 import { LoggedInContext } from '../../util/context.interface';
 import { SchoolRepository } from '../school/school.repository';
-import { Category } from '../../entity/category.entity';
-import { CategoryRepository } from '../category/category.repository';
 
 @InputType()
 class NewProductDataInput {
@@ -42,8 +27,6 @@ export class ProductResolver {
   private readonly productRepository: ProductRepository;
   @InjectRepository(SchoolRepository)
   private readonly schoolRepository: SchoolRepository;
-  @InjectRepository(CategoryRepository)
-  private readonly categoryRepository: CategoryRepository;
 
   @Query(() => [Product], { description: 'Returns a list of products' })
   @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
@@ -62,9 +45,7 @@ export class ProductResolver {
 
     // Return products of the school in which the user is in
     const schoolId = ctx.user.school.id;
-    const school = await this.schoolRepository.findOne(schoolId, {
-      relations: ['products'],
-    });
+    const school = await this.schoolRepository.findOne(schoolId);
 
     return school ? school.products : [];
   }
@@ -98,17 +79,5 @@ export class ProductResolver {
 
     await this.productRepository.remove(product);
     return true;
-  }
-
-  @FieldResolver(() => [School])
-  public async schools(@Root() product: Product) {
-    const foundProduct = await this.productRepository.findOne(product.id, { relations: ['schools'] });
-
-    return foundProduct ? foundProduct.schools : [];
-  }
-
-  @FieldResolver(() => Category)
-  public async category(@Root() product: Product) {
-    return this.categoryRepository.findOne({ where: { id: product.categoryId } });
   }
 }
