@@ -1,23 +1,9 @@
-import {
-  Resolver,
-  Query,
-  FieldResolver,
-  Root,
-  Authorized,
-  InputType,
-  Field,
-  Mutation,
-  Arg,
-  Ctx,
-  ID,
-} from 'type-graphql';
+import { Resolver, Query, FieldResolver, Root, Authorized, InputType, Field, Mutation, Arg, ID } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Product } from '../../entity/product.entity';
 import { ProductRepository } from './product.repository';
 import { School } from '../../entity/school.entity';
 import { Role } from '../../entity/user.entity';
-import { LoggedInContext } from '../../util/context.interface';
-import { SchoolRepository } from '../school/school.repository';
 import { Category } from '../../entity/category.entity';
 import { CategoryRepository } from '../category/category.repository';
 
@@ -40,33 +26,13 @@ class NewProductDataInput {
 export class ProductResolver {
   @InjectRepository(ProductRepository)
   private readonly productRepository: ProductRepository;
-  @InjectRepository(SchoolRepository)
-  private readonly schoolRepository: SchoolRepository;
   @InjectRepository(CategoryRepository)
   private readonly categoryRepository: CategoryRepository;
 
-  @Query(() => [Product], { description: 'Returns a list of products' })
+  @Query(() => [Product], { description: 'Returns all products' })
   @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
-  public async products(
-    @Ctx() ctx: LoggedInContext,
-    @Arg('getAll', {
-      defaultValue: false,
-      description: "If true returns all products, not just the products available in the user's school",
-    })
-    getAll: boolean,
-  ) {
-    // Return all products
-    if (getAll) {
-      return await this.productRepository.find();
-    }
-
-    // Return products of the school in which the user is in
-    const schoolId = ctx.user.school.id;
-    const school = await this.schoolRepository.findOne(schoolId, {
-      relations: ['products'],
-    });
-
-    return school ? school.products : [];
+  public async products() {
+    return await this.productRepository.find();
   }
 
   @Query(() => Product, { nullable: true, description: 'Returns a product given its ID' })
