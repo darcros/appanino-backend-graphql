@@ -15,7 +15,6 @@ export class LoginResolver {
   public async login(@Arg('email') LoginEmail: string, @Arg('password') password: string) {
     const foundUser = await this.userRepository.findOne({
       where: { email: LoginEmail },
-      relations: ['school'],
     });
 
     if (!foundUser) {
@@ -27,7 +26,9 @@ export class LoginResolver {
       throw LOGIN_FAILED;
     }
 
-    const { id, role, school } = foundUser;
+    const { id, role } = foundUser;
+    const school = await foundUser.school;
+
     const userData: JwtUserInfo = {
       id,
       role,

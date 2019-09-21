@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOn
 import { ObjectType, Field, ID } from 'type-graphql';
 import { School } from './school.entity';
 import { Category } from './category.entity';
+import { Lazy } from '../database/typeorm.helper';
 
 @Entity('products')
 @ObjectType()
@@ -18,13 +19,12 @@ export class Product {
   @Column('decimal')
   public price: number;
 
-  @ManyToMany(() => School, school => school.products)
+  @Field(() => [School])
+  @ManyToMany(() => School, school => school.products, { lazy: true })
   @JoinTable({ name: 'schools_products' })
-  public schools: School[];
+  public schools: Lazy<School[]>;
 
-  @Column('int', { nullable: false })
-  public categoryId: number;
-
-  @ManyToOne(() => Category, category => category.products)
-  public category: Category;
+  @Field(() => Category)
+  @ManyToOne(() => Category, category => category.products, { lazy: true })
+  public category: Lazy<Category>;
 }

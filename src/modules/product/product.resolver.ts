@@ -1,11 +1,8 @@
-import { Resolver, Query, FieldResolver, Root, Authorized, InputType, Field, Mutation, Arg, ID } from 'type-graphql';
+import { Resolver, Query, Authorized, InputType, Field, Mutation, Arg, ID } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Product } from '../../entity/product.entity';
 import { ProductRepository } from './product.repository';
-import { School } from '../../entity/school.entity';
 import { Role } from '../../entity/user.entity';
-import { Category } from '../../entity/category.entity';
-import { CategoryRepository } from '../category/category.repository';
 
 @InputType()
 class NewProductDataInput {
@@ -26,8 +23,6 @@ class NewProductDataInput {
 export class ProductResolver {
   @InjectRepository(ProductRepository)
   private readonly productRepository: ProductRepository;
-  @InjectRepository(CategoryRepository)
-  private readonly categoryRepository: CategoryRepository;
 
   @Query(() => [Product], { description: 'Returns all products' })
   @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
@@ -64,17 +59,5 @@ export class ProductResolver {
 
     await this.productRepository.remove(product);
     return true;
-  }
-
-  @FieldResolver(() => [School])
-  public async schools(@Root() product: Product) {
-    const foundProduct = await this.productRepository.findOne(product.id, { relations: ['schools'] });
-
-    return foundProduct ? foundProduct.schools : [];
-  }
-
-  @FieldResolver(() => Category)
-  public async category(@Root() product: Product) {
-    return this.categoryRepository.findOne({ where: { id: product.categoryId } });
   }
 }

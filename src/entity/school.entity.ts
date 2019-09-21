@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany } from 'typeorm';
 import { ObjectType, Field, ID } from 'type-graphql';
+import { Lazy } from '../database/typeorm.helper';
 import { User } from './user.entity';
 import { Product } from './product.entity';
 
@@ -14,9 +15,11 @@ export class School {
   @Column('varchar')
   public name: string;
 
-  @OneToMany(() => User, user => user.school)
-  public users: User[];
+  @Field(() => [User])
+  @OneToMany(() => User, user => user.school, { lazy: true })
+  public users: Lazy<User[]>;
 
-  @ManyToMany(() => Product, product => product.schools)
-  public products: Product[];
+  @Field(() => [Product])
+  @ManyToMany(() => Product, product => product.schools, { lazy: true })
+  public products: Lazy<Product[]>;
 }
