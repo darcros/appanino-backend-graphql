@@ -26,7 +26,7 @@ export class SelfResolver {
   @Mutation(() => User, { description: 'Update data on the current user' })
   public async updateSelf(@Ctx() ctx: LoggedInContext, @Arg('updateData') input: UserUpdateInput) {
     await this.userRepository.update(ctx.user.id, input);
-    return this.userRepository.findOne(ctx.user.id);
+    return this.userRepository.findOneOrFail(ctx.user.id);
   }
 
   @Authorized()

@@ -47,6 +47,9 @@ export class User {
   @Field(() => Role)
   public role: Role;
 
+  @Column('int')
+  public schoolId: number;
+
   @Field(() => School)
   @ManyToOne(() => School, school => school.users, { lazy: true })
   public school: Lazy<School>;

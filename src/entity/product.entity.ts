@@ -24,6 +24,9 @@ export class Product {
   @JoinTable({ name: 'schools_products' })
   public schools: Lazy<School[]>;
 
+  @Column('int')
+  public categoryId: number;
+
   @Field(() => Category)
   @ManyToOne(() => Category, category => category.products, { lazy: true })
   public category: Lazy<Category>;
