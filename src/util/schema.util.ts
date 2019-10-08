@@ -9,6 +9,7 @@ export async function bootstrapSchema() {
   const schema = await buildSchema({
     resolvers: [join(__dirname, '../modules/**/*.resolver.ts')], // Load all the resolver in the modules folder
     authChecker: customAuthChecker,
+    validate: true,
   });
 
   return schema; // Created schema

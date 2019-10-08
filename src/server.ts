@@ -6,7 +6,8 @@ import { ApolloServer } from 'apollo-server-express';
 import { bootstrapSchema } from './util/schema.util';
 import { Container } from 'typedi';
 import { useContainer } from 'typeorm';
-import { useContainer as typeUseContainer } from 'type-graphql';
+import { useContainer as typeUseContainer, ArgumentValidationError } from 'type-graphql';
+import { GraphQLError } from 'graphql';
 import { Context } from './util/context.interface';
 import { JwtUserInfo } from './modules/authentication/jwtUserInfo.interface';
 
@@ -43,6 +44,21 @@ export default async () => {
       } catch (e) {
         return {};
       }
+    },
+    formatError: err => {
+      const rewriteCode = (err: GraphQLError, code: string) => ({
+        ...err,
+        extensions: {
+          ...err.extensions,
+          code,
+        },
+      });
+
+      if (err.originalError instanceof ArgumentValidationError) {
+        return rewriteCode(err, 'VALIDATION_FAILED');
+      }
+
+      return err;
     },
   });
   apollo.applyMiddleware({ app, path });
