@@ -1,24 +1,10 @@
-import { Resolver, Query, Authorized, InputType, Field, Mutation, Arg, ID } from 'type-graphql';
+import { Resolver, Query, Authorized, Mutation, Arg, ID } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Product } from '../../entity/product.entity';
 import { ProductRepository } from './product.repository';
 import { Role } from '../../entity/user.entity';
 import { SchoolRepository } from '../school/school.repository';
-
-@InputType()
-class NewProductDataInput {
-  @Field(() => String)
-  public name: string;
-
-  @Field(() => Number)
-  public price: number;
-
-  @Field(() => [ID])
-  public schoolIds: number[];
-
-  @Field(() => ID)
-  public categoryId: number;
-}
+import { NewProductInput } from './newProduct.input';
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -41,7 +27,7 @@ export class ProductResolver {
 
   @Mutation(() => Product, { description: 'Creates a new product' })
   @Authorized(Role.Admin, Role.SchoolAdmin)
-  public async addProduct(@Arg('newProductData') newProductData: NewProductDataInput) {
+  public async addProduct(@Arg('newProductData') newProductData: NewProductInput) {
     const { name, price, schoolIds, categoryId } = newProductData;
     const schools = await this.schoolRepository.findByIds(schoolIds);
 

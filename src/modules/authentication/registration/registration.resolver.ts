@@ -1,25 +1,8 @@
-import { Resolver, Mutation, InputType, Field, ID, Arg } from 'type-graphql';
+import { Resolver, Mutation, Arg } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { UserRepository } from '../../user/user.repository';
 import { User } from '../../../entity/user.entity';
-
-@InputType()
-class UserRegistrationDataInput {
-  @Field(() => String)
-  public firstname: string;
-
-  @Field(() => String)
-  public lastname: string;
-
-  @Field(() => String)
-  public email: string;
-
-  @Field(() => String)
-  public password: string;
-
-  @Field(() => ID)
-  public schoolId: number;
-}
+import { UserRegistrationInput } from './registration.input';
 
 @Resolver()
 export class RegistrationResolver {
@@ -27,7 +10,7 @@ export class RegistrationResolver {
   private readonly userRepository: UserRepository;
 
   @Mutation(() => User, { description: 'creates a new user' })
-  public async register(@Arg('userRegistrationData') userRegistrationData: UserRegistrationDataInput) {
+  public async register(@Arg('userRegistrationData') userRegistrationData: UserRegistrationInput) {
     const newUser = this.userRepository.create(userRegistrationData);
     return this.userRepository.save(newUser);
   }
