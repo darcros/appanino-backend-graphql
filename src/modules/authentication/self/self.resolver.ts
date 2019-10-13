@@ -1,8 +1,8 @@
 import * as bcrypt from 'bcrypt';
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { Role, User } from '../../../entity/user.entity';
-import { LoggedInContext } from '../../../util/context.interface';
+import { User } from '../../../entity/user.entity';
+import { Context, LoggedInContext } from '../../../util/context.interface';
 import { UserRepository } from '../../user/user.repository';
 import { PasswordUpdateInput } from './passwordUpdate.input';
 import { UserUpdateInput } from './userUpdate.input';
@@ -16,9 +16,9 @@ export class SelfResolver {
   @InjectRepository(UserRepository)
   private readonly userRepository: UserRepository;
 
-  @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
-  @Query(() => User)
-  public async self(@Ctx() ctx: LoggedInContext) {
+  @Query(() => User, { nullable: true })
+  public async self(@Ctx() ctx: Context) {
+    if (!ctx.user) return null;
     return this.userRepository.findOneOrFail(ctx.user.id);
   }
 
