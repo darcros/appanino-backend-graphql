@@ -10,7 +10,7 @@ export class RegistrationResolver {
   private readonly userRepository: UserRepository;
 
   @Mutation(() => User, { description: 'creates a new user' })
-  public async register(@Arg('userRegistrationData') userRegistrationData: UserRegistrationInput) {
+  public async registerUser(@Arg('userRegistrationData') userRegistrationData: UserRegistrationInput) {
     const newUser = this.userRepository.create(userRegistrationData);
     return this.userRepository.save(newUser);
   }
