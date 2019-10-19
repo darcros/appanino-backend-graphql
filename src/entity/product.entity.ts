@@ -19,6 +19,11 @@ export class Product {
   @Column('decimal')
   public price: number;
 
+  // new Products are hidden by default
+  @Field(() => Boolean)
+  @Column('boolean', { default: true, nullable: false })
+  public hidden: boolean;
+
   @Field(() => [School])
   @ManyToMany(() => School, school => school.products, { lazy: true })
   @JoinTable({ name: 'schools_products' })

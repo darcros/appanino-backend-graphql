@@ -5,6 +5,7 @@ import { ProductRepository } from './product.repository';
 import { Role } from '../../entity/user.entity';
 import { SchoolRepository } from '../school/school.repository';
 import { NewProductInput } from './newProduct.input';
+import { UpdateVisibilityInput } from './updateVisibility.input';
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -16,13 +17,17 @@ export class ProductResolver {
   @Query(() => [Product], { description: 'Returns all products' })
   @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
   public async products() {
-    return await this.productRepository.find();
+    return await this.productRepository.find({
+      where: { hidden: false },
+    });
   }
 
   @Query(() => Product, { nullable: true, description: 'Returns a product given its ID' })
   @Authorized(Role.Admin, Role.SchoolAdmin, Role.User)
   public async product(@Arg('id', () => ID) id: number) {
-    return await this.productRepository.findOne(id);
+    return await this.productRepository.findOne(id, {
+      where: { hidden: false },
+    });
   }
 
   @Mutation(() => Product, { description: 'Creates a new product' })
@@ -47,11 +52,13 @@ export class ProductResolver {
     return this.productRepository.save(newProduct);
   }
 
-  @Mutation(() => Boolean, { description: 'Deletes a products given its ID' })
+  @Mutation(() => Product, { description: 'Show or hide a product' })
   @Authorized(Role.Admin, Role.SchoolAdmin)
-  public async deleteProduct(@Arg('id', () => ID) id: number) {
-    const product = await this.productRepository.findOneOrFail(id);
-    await this.productRepository.remove(product);
-    return true;
+  public async updateProductVisibility(@Arg('updateVisibilityData') data: UpdateVisibilityInput) {
+    const { productId, visible } = data;
+    const product = await this.productRepository.findOneOrFail(productId);
+    product.hidden = !visible;
+
+    return this.productRepository.save(product);
   }
 }
