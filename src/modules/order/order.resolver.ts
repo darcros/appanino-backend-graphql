@@ -8,7 +8,7 @@ import { OrderInput } from './order.input';
 import { OrderItemRepository } from './orderItem.repository';
 
 @Resolver(() => Order)
-export class ProductResolver {
+export class OrderResolver {
   @InjectRepository(OrderRepository)
   private readonly orderRepository: OrderRepository;
   @InjectRepository(OrderItemRepository)
