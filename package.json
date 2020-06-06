@@ -34,7 +34,7 @@
     "lint": "eslint src/**/**.ts"
   },
   "dependencies": {
-    "apollo-server-express": "^2.6.4",
+    "apollo-server-express": "^2.14.2",
     "bcrypt": "^3.0.6",
     "class-validator": "^0.9.1",
     "express": "^4.17.1",
