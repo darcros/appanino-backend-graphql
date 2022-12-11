@@ -37,7 +37,7 @@
     "apollo-server-express": "^2.6.4",
     "bcrypt": "^3.0.6",
     "class-validator": "^0.9.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "graphql": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
     "pg": "^7.11.0",
